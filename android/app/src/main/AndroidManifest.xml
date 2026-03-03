@@ -1,0 +1,64 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+    <!-- CÁMARA: Requerido para react-native-vision-camera -->
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <!-- Features de hardware (opcional pero recomendado) -->
+    <!-- required="false" permite instalar la app en dispositivos sin cámara -->
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
+
+    <!-- CÁMARA: Remover permisos de medios agregados automáticamente por react-native-vision-camera -->
+    <!-- La app solo CAPTURA fotos nuevas, NO lee la galería existente del dispositivo -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" tools:node="remove" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" tools:node="remove" />
+
+    <!-- GEOLOCALIZACIÓN EN SEGUNDO PLANO -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" 
+        tools:node="replace" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!-- PUBLICIDAD Y ANALÍTICA -->
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID"/> <!-- Acceso al identificador de anuncios de Google -->
+
+    <application
+      android:name=".MainApplication"
+      android:label="@string/app_name"
+      android:icon="@mipmap/ic_launcher"
+      android:roundIcon="@mipmap/ic_launcher_round"
+      android:allowBackup="false"
+      android:theme="@style/AppTheme"
+      android:usesCleartextTraffic="true"
+      android:supportsRtl="true">
+
+      <meta-data android:name="com.transistorsoft.locationmanager.license" android:value="e086d476ab9ab478806056b426fa5b1ea61b6188dd397bf57da274352c4f6802" />
+
+      <!-- Declaración de que NO se utiliza ID de publicidad -->
+      <meta-data
+        android:name="com.google.android.gms.ads.AD_ID_OPT_OUT"
+        android:value="true" />
+
+      <activity
+        android:name=".MainActivity"
+        android:label="@string/app_name"
+        android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode"
+        android:launchMode="singleTask"
+        android:windowSoftInputMode="adjustResize"
+        android:screenOrientation="portrait"
+        android:exported="true">
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
+      </activity>
+    </application>
+</manifest>
