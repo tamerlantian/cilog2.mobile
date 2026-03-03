@@ -2,11 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>BGTaskSchedulerPermittedIdentifiers</key>
-	<array>
-		<string>com.transistorsoft.fetch</string>
-		<string>com.transistorsoft.customtask</string>
-	</array>
 	<key>LSApplicationCategoryType</key>
 	<string></string>
 	<key>UIDeviceFamily</key>
@@ -16,8 +11,9 @@
 	</array>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
+	<!-- TODO: Replace with your app's display name -->
 	<key>CFBundleDisplayName</key>
-	<string>Ruteo.co</string>
+	<string>Mi App</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -42,31 +38,14 @@
 		<false/>
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
-		<key>NSExceptionDomains</key>
-		<dict>
-			<key>ruteoapi.online</key>
-			<dict>
-				<key>NSIncludesSubdomains</key>
-				<true/>
-				<key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key>
-				<true/>
-				<key>NSTemporaryExceptionMinimumTLSVersion</key>
-				<string>TLSv1.1</string>
-			</dict>
-		</dict>
+		<!-- TODO: Add NSExceptionDomains for your dev API if it uses HTTP -->
 	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string>Esta aplicación necesita acceso a la cámara para tomar fotos de las entregas y escanear códigos QR y códigos de barras.</string>
-	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>La app necesita tu ubicación precisa para rastrear y mejorar el proceso de entrega.</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>La app utiliza tu ubicación para mostrar rutas y ofrecer funcionalidades basadas en localización.</string>
-	<key>NSMotionUsageDescription</key>
-	<string>Ruteo necesita detectar tu actividad física para optimizar el seguimiento de entregas y ahorrar batería cuando estás estacionario.</string>
+	<string>Esta aplicación necesita acceso a la cámara para tomar fotos y escanear códigos QR y códigos de barras.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>Esta aplicación necesita acceso para agregar fotos a la galería cuando se guarden las firmas digitales.</string>
+	<string>Esta aplicación necesita acceso para agregar fotos a la galería.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Esta aplicación necesita permiso para guardar las firmas digitales en la galería de fotos.</string>
+	<string>Esta aplicación necesita permiso para guardar fotos en la galería.</string>
 	<key>NSCalendarsUsageDescription</key>
 	<string>Esta aplicación no accede a tu calendario. Este permiso es requerido por librerías externas pero no se utiliza en la funcionalidad de la app.</string>
 	<key>NSContactsUsageDescription</key>
@@ -84,12 +63,6 @@
 	<key>UIAppFonts</key>
 	<array>
 		<string>Ionicons.ttf</string>
-	</array>
-	<key>UIBackgroundModes</key>
-	<array>
-		<string>location</string>
-		<string>fetch</string>
-		<string>processing</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>

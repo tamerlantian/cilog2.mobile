@@ -1,4 +1,4 @@
-package com.anonymous.lutencio
+package com.yourcompany.yourapp
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
@@ -8,15 +8,12 @@ import com.facebook.react.defaults.DefaultReactActivityDelegate
 class MainActivity : ReactActivity() {
 
   /**
-   * Returns the name of the main component registered from JavaScript. This is used to schedule
-   * rendering of the component.
+   * Returns the name of the main component registered from JavaScript.
+   * Must match the "name" field in app.json.
    */
-  override fun getMainComponentName(): String = "lutencio"
+  // TODO: Replace with your app's name (must match app.json "name" field)
+  override fun getMainComponentName(): String = "Cilog2"
 
-  /**
-   * Returns the instance of the [ReactActivityDelegate]. We use [DefaultReactActivityDelegate]
-   * which allows you to enable New Architecture with a single boolean flags [fabricEnabled]
-   */
   override fun createReactActivityDelegate(): ReactActivityDelegate =
       DefaultReactActivityDelegate(this, mainComponentName, fabricEnabled)
 }

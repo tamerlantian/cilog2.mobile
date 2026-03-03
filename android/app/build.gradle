@@ -78,13 +78,15 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace "com.anonymous.lutencio"
+    // TODO: Replace with your app's package name
+    namespace "com.yourcompany.yourapp"
     defaultConfig {
-        applicationId "com.anonymous.lutencio"
+        // TODO: Replace with your app's application ID
+        applicationId "com.yourcompany.yourapp"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 58
-        versionName "1.6.4"
+        versionCode 1
+        versionName "1.0.0"
     }
     signingConfigs {
         debug {

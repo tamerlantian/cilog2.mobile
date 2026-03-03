@@ -1,9 +1,6 @@
 PODS:
   - BEMCheckBox (1.4.1)
   - boost (1.84.0)
-  - CocoaLumberjack (3.8.5):
-    - CocoaLumberjack/Core (= 3.8.5)
-  - CocoaLumberjack/Core (3.8.5)
   - DoubleConversion (1.1.6)
   - fast_float (8.0.0)
   - FBLazyVector (0.81.5)
@@ -2488,12 +2485,6 @@ PODS:
     - React-perflogger (= 0.81.5)
     - React-utils (= 0.81.5)
     - SocketRocket
-  - RNBackgroundFetch (4.3.0):
-    - React-Core
-    - TSBackgroundFetch (~> 4.0.0)
-  - RNBackgroundGeolocation (4.19.4):
-    - CocoaLumberjack (~> 3.8.5)
-    - React-Core
   - RNCAsyncStorage (2.2.0):
     - boost
     - DoubleConversion
@@ -2821,7 +2812,6 @@ PODS:
     - Yoga
   - Sentry/HybridSDK (8.58.0)
   - SocketRocket (0.7.1)
-  - TSBackgroundFetch (4.0.6)
   - VisionCamera (4.7.3):
     - VisionCamera/Core (= 4.7.3)
     - VisionCamera/React (= 4.7.3)
@@ -2908,8 +2898,6 @@ DEPENDENCIES:
   - ReactAppDependencyProvider (from `build/generated/ios`)
   - ReactCodegen (from `build/generated/ios`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
-  - RNBackgroundFetch (from `../node_modules/react-native-background-fetch`)
-  - RNBackgroundGeolocation (from `../node_modules/react-native-background-geolocation`)
   - "RNCAsyncStorage (from `../node_modules/@react-native-async-storage/async-storage`)"
   - "RNCCheckbox (from `../node_modules/@react-native-community/checkbox`)"
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
@@ -2924,11 +2912,9 @@ DEPENDENCIES:
 SPEC REPOS:
   trunk:
     - BEMCheckBox
-    - CocoaLumberjack
     - React-Codegen
     - Sentry
     - SocketRocket
-    - TSBackgroundFetch
 
 EXTERNAL SOURCES:
   boost:
@@ -3084,10 +3070,6 @@ EXTERNAL SOURCES:
     :path: build/generated/ios
   ReactCommon:
     :path: "../node_modules/react-native/ReactCommon"
-  RNBackgroundFetch:
-    :path: "../node_modules/react-native-background-fetch"
-  RNBackgroundGeolocation:
-    :path: "../node_modules/react-native-background-geolocation"
   RNCAsyncStorage:
     :path: "../node_modules/@react-native-async-storage/async-storage"
   RNCCheckbox:
@@ -3110,7 +3092,6 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   BEMCheckBox: 5ba6e37ade3d3657b36caecc35c8b75c6c2b1a4e
   boost: 7e761d76ca2ce687f7cc98e698152abd03a18f90
-  CocoaLumberjack: 6a459bc897d6d80bd1b8c78482ec7ad05dffc3f0
   DoubleConversion: cb417026b2400c8f53ae97020b2be961b59470cb
   fast_float: b32c788ed9c6a8c584d114d0047beda9664e7cc6
   FBLazyVector: 5beb8028d5a2e75dd9634917f23e23d3a061d2aa
@@ -3187,8 +3168,6 @@ SPEC CHECKSUMS:
   ReactAppDependencyProvider: c277c5b231881ad4f00cd59e3aa0671b99d7ebee
   ReactCodegen: 0936e9ff5fd359d5f6b5173c2a90e91b446d33a3
   ReactCommon: 8df6e27c060970b9fb77a86e69a1cf9b934ea458
-  RNBackgroundFetch: 73318e61a4062a9eb27397045b591e6698c929c5
-  RNBackgroundGeolocation: cd4e4d4b9ff6174a7c5f459d366aede71193607a
   RNCAsyncStorage: 302f2fac014fd450046c120567ca364632da682b
   RNCCheckbox: 471ebdc33884c084f362615c1ef3507496cc07f1
   RNGestureHandler: 92ad734ef0da16d69d0a325b7e1e9ae80bdce1f9
@@ -3198,7 +3177,6 @@ SPEC CHECKSUMS:
   RNSentry: a0d93291396fc07e197a709e55855a16effc9322
   Sentry: d587a8fe91ca13503ecd69a1905f3e8a0fcf61be
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
-  TSBackgroundFetch: 0afbeaae4e1132866e1d4b6e55265af26b5958ae
   VisionCamera: 3ea10c46a5c612f5f89fb46a54bef4a0de8b58a7
   Yoga: d7064c22f7ba5890471d32dd95e72c77ec911f26
 
