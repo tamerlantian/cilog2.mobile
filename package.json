@@ -8,7 +8,11 @@
     "lint": "eslint .",
     "start": "react-native start",
     "test": "jest",
-    "prepare": "husky"
+    "prepare": "husky",
+    "release": "standard-version",
+    "release:patch": "standard-version --release-as patch",
+    "release:minor": "standard-version --release-as minor",
+    "release:major": "standard-version --release-as major"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
@@ -74,6 +78,7 @@
     "lint-staged": "^16.3.2",
     "prettier": "2.8.8",
     "react-test-renderer": "19.1.0",
+    "standard-version": "^9.5.0",
     "typescript": "^5.8.3"
   },
   "engines": {

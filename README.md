@@ -451,6 +451,10 @@ test: agregar o modificar tests
 refactor: refactorización de código
 ```
 
+### Release
+
+Ver [`docs/RELEASE.md`](./docs/RELEASE.md) para el flujo completo de versionamiento y cómo generar releases.
+
 ## Recursos
 
 - [React Native Docs](https://reactnative.dev/docs/getting-started)
