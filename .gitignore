@@ -77,3 +77,11 @@ yarn-error.log
 # Sentry
 android/sentry.properties
 ios/sentry.properties
+
+# Environment variables — NUNCA commitear valores reales
+.env
+.env.local
+.env.development
+.env.staging
+.env.production
+# .env.example SÍ se commitea (template sin valores reales)

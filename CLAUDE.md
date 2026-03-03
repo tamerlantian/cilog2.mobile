@@ -156,11 +156,11 @@ Service location: `src/shared/services/background-geolocation.service.ts`
 
 ### Environment & API Configuration
 
-Dynamic API base URL switching:
-- `environment.apiBase` can be switched at runtime via `updateApiBaseUrl(isDeveloperMode)`
-- Dev URL: `http://ruteoapi.online`
-- Prod URL: `https://ruteoapi.co`
+API base URL is configured via `react-native-config` reading from `.env` files:
+- `environment.apiBase` reads `API_BASE_URL` from the active `.env` file
+- Each environment (development, staging, production) has its own `.env.*` file with the corresponding URL
 - HttpBaseRepository reads `environment.apiBase` dynamically on each request
+- Copy `.env.example` to `.env` and set `API_BASE_URL` to get started
 
 ### Token Refresh Flow
 

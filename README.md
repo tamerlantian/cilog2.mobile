@@ -124,6 +124,14 @@ cd ios && bundle exec pod install && cd ..
 
 > **Nota**: Ejecuta `bundle exec pod install` cada vez que actualices dependencias nativas.
 
+5. **Configurar variables de entorno**
+```bash
+cp .env.example .env
+# Edita .env con los valores reales
+```
+
+> Ver sección [Variables de Entorno](#variables-de-entorno) para instrucciones completas, incluyendo el paso manual de Xcode para iOS.
+
 ## Desarrollo
 
 ### Ejecutar la Aplicación
@@ -237,10 +245,50 @@ npm test -- error-boundary.test.tsx
 
 ### Variables de Entorno
 
-La app soporta cambio dinámico entre ambientes (dev/prod) via toggle en settings:
+La app usa `react-native-config` para leer variables de entorno desde archivos `.env`.
 
-- **Dev**: `http://ruteoapi.online`
-- **Prod**: `https://ruteoapi.co`
+#### Setup inicial
+
+```bash
+cp .env.example .env
+# Edita .env con los valores reales (está en .gitignore)
+```
+
+| Archivo            | Uso                           | En git |
+|--------------------|-------------------------------|--------|
+| `.env.example`     | Template con todas las keys   | ✅     |
+| `.env`             | Entorno local                 | ❌     |
+| `.env.development` | Valores de desarrollo         | ❌     |
+| `.env.staging`     | Valores de staging            | ❌     |
+| `.env.production`  | Valores de producción         | ❌     |
+
+**Variables disponibles:**
+
+| Variable        | Descripción           |
+|-----------------|-----------------------|
+| `API_BASE_URL`  | URL base de la API    |
+
+Cada ambiente tiene su propio archivo `.env.*` con la URL correspondiente a ese ambiente.
+
+#### Configuración iOS — paso manual en Xcode
+
+`react-native-config` requiere un Build Phase adicional en Xcode para que las variables estén disponibles en iOS:
+
+1. Abre `ios/ruteo.xcworkspace` en Xcode
+2. Selecciona el target `ruteo` → pestaña **Build Phases**
+3. Presiona **+** → **New Run Script Phase**
+4. Arrastra la nueva fase para que quede **antes** de "Bundle React Native code and images"
+5. Pega el siguiente script:
+
+```sh
+"${SRCROOT}/../node_modules/react-native-config/ios/ReactNativeConfig/BuildXCConfig.rb" \
+  "${SRCROOT}/.." \
+  "${SRCROOT}/tmp.xcconfig"
+```
+
+6. Desmarca **"Based on dependency analysis"**
+
+Sin este paso, las variables de `.env` no estarán disponibles en iOS.
 
 ### Sentry Configuration
 
