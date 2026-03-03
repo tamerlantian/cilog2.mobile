@@ -14,6 +14,7 @@ import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { AuthProvider } from './src/modules/auth/context/auth.context';
 import { Provider } from 'react-redux';
 import { store } from './src/store';
+import { PaperProvider, MD3LightTheme } from 'react-native-paper';
 import { initializeServices } from './src/core/services/init-services';
 import Toast from 'react-native-toast-message';
 import { KeyboardProvider } from "react-native-keyboard-controller";
@@ -90,6 +91,7 @@ function App() {
   return (
     <ErrorBoundary level="root" onError={handleRootError}>
       <Provider store={store}>
+        <PaperProvider theme={MD3LightTheme}>
         <GestureHandlerRootView style={styles.gestureHandler}>
           <QueryClientProvider client={queryClient}>
             <KeyboardProvider>
@@ -109,6 +111,7 @@ function App() {
           </QueryClientProvider>
         </GestureHandlerRootView>
         <Toast visibilityTime={2000} />
+        </PaperProvider>
       </Provider>
     </ErrorBoundary>
   );
