@@ -9,7 +9,6 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AppNavigator } from './src/navigation';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { DevModeProvider } from './src/shared/context/dev-mode-context';
 import { ToastProvider } from './src/shared/context';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { AuthProvider } from './src/modules/auth/context/auth.context';
@@ -96,16 +95,14 @@ function App() {
             <KeyboardProvider>
             <BottomSheetModalProvider>
               <ToastProvider>
-                <DevModeProvider>
-                  <AuthProvider>
-                    <SafeAreaProvider>
-                      <StatusBar
-                        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-                      />
-                      <AppContent />
-                    </SafeAreaProvider>
-                  </AuthProvider>
-                </DevModeProvider>
+                <AuthProvider>
+                  <SafeAreaProvider>
+                    <StatusBar
+                      barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+                    />
+                    <AppContent />
+                  </SafeAreaProvider>
+                </AuthProvider>
               </ToastProvider>
             </BottomSheetModalProvider>
             </KeyboardProvider>

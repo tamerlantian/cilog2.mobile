@@ -93,16 +93,6 @@ export const loginStyles = StyleSheet.create({
     alignItems: 'center',
     zIndex: 1000,
   },
-  // Estilos para el botón de modo desarrollador
-  devModeButton: {
-    position: 'absolute',
-    top: 40,
-    right: 20,
-    zIndex: 100,
-    padding: 10,
-    borderRadius: 20,
-    backgroundColor: 'rgba(245, 245, 245, 0.9)',
-  },
   // Estilos para el checkbox de términos y condiciones
   checkboxContainer: {
     flexDirection: 'row',
