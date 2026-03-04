@@ -1,21 +1,16 @@
-import { Ionicons } from '@react-native-vector-icons/ionicons';
 import React from 'react';
-import { useForm } from 'react-hook-form';
-import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { Controller, useForm } from 'react-hook-form';
+import { ScrollView, StyleSheet, View } from 'react-native';
+import { Button, Text, TextInput } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ForgotPasswordFormValues } from '../models/Auth';
-import { loginStyles } from '../styles/login.style';
-import { useForgotPassword } from '../view-models/forgot-password.view-model';
-import { FormInputController } from '../../../shared/components/ui/form/FormInputController';
-import { FormButton } from '../../../shared/components/ui/button/FormButton';
 import { useAuthNavigation } from '../../../navigation/hooks';
+import { ForgotPasswordFormValues } from '../models/Auth';
+import { useForgotPassword } from '../view-models/forgot-password.view-model';
 
 export const ForgotPasswordScreen = () => {
-  // ViewModel para recuperación de contraseña
   const { forgotPassword, isLoading } = useForgotPassword();
   const navigation = useAuthNavigation();
 
-  // Configurar React Hook Form
   const {
     control,
     handleSubmit,
@@ -28,70 +23,126 @@ export const ForgotPasswordScreen = () => {
     mode: 'onChange',
   });
 
-  // Manejar envío del formulario
   const onSubmit = (data: ForgotPasswordFormValues) => {
     forgotPassword(data);
   };
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <ScrollView contentContainerStyle={loginStyles.container} keyboardShouldPersistTaps="handled">
-        <Text style={loginStyles.title}>Recuperar contraseña</Text>
-        <Text
-          style={{
-            textAlign: 'center',
-            marginBottom: 20,
-            color: '#666',
-            fontSize: 16,
-          }}
-        >
-          Ingresa tu correo electrónico y te enviaremos instrucciones para restablecer tu contraseña
-        </Text>
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView
+        contentContainerStyle={styles.container}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View style={styles.header}>
+          <Text variant="headlineMedium" style={styles.title}>
+            Recuperar contraseña
+          </Text>
+          <Text variant="bodyMedium" style={styles.subtitle}>
+            Ingresa tu correo electrónico y te enviaremos instrucciones para
+            restablecer tu contraseña
+          </Text>
+        </View>
 
-        {/* Campo de email */}
-        <FormInputController<ForgotPasswordFormValues>
-          control={control}
-          name="username"
-          label="Correo electrónico"
-          placeholder="john.doe@example.com"
-          keyboardType="email-address"
-          autoCapitalize="none"
-          error={errors.username}
-          rules={{
-            required: 'El correo electrónico es obligatorio',
-            pattern: {
-              value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-              message: 'Correo electrónico inválido',
-            },
-          }}
-        />
-
-        {/* Botón de enviar */}
-        <FormButton
-          title="Enviar Instrucciones"
-          onPress={handleSubmit(onSubmit)}
-          disabled={!isValid}
-          isLoading={isLoading}
-        />
-
-        {/* Enlace para volver al login */}
-        <View style={loginStyles.footer}>
-          <TouchableOpacity
-            onPress={() => {
-              navigation.navigate('Login');
+        <View style={styles.form}>
+          <Controller
+            control={control}
+            name="username"
+            rules={{
+              required: 'El correo electrónico es obligatorio',
+              pattern: {
+                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                message: 'Correo electrónico inválido',
+              },
             }}
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginTop: 20,
-            }}
+            render={({ field: { onChange, onBlur, value } }) => (
+              <TextInput
+                label="Correo electrónico"
+                mode="outlined"
+                keyboardType="email-address"
+                autoCapitalize="none"
+                onChangeText={onChange}
+                onBlur={onBlur}
+                value={value}
+                error={!!errors.username}
+                style={styles.input}
+                left={<TextInput.Icon icon="email-outline" />}
+              />
+            )}
+          />
+          {errors.username && (
+            <Text variant="bodySmall" style={styles.errorText}>
+              {errors.username.message}
+            </Text>
+          )}
+
+          <Button
+            mode="contained"
+            onPress={handleSubmit(onSubmit)}
+            disabled={!isValid || isLoading}
+            loading={isLoading}
+            style={styles.button}
+            contentStyle={styles.buttonContent}
           >
-            <Ionicons name="arrow-back" size={16} color="#007aff" />
-            <Text style={[loginStyles.footerLink, { marginLeft: 5 }]}>Volver a iniciar sesión</Text>
-          </TouchableOpacity>
+            Enviar instrucciones
+          </Button>
+
+          <Button
+            mode="text"
+            icon="arrow-left"
+            onPress={() => navigation.navigate('Login')}
+            style={styles.backButton}
+          >
+            Volver a iniciar sesión
+          </Button>
         </View>
       </ScrollView>
     </SafeAreaView>
   );
 };
+
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#f5f5f5',
+  },
+  container: {
+    flexGrow: 1,
+    padding: 24,
+    justifyContent: 'center',
+  },
+  header: {
+    marginBottom: 32,
+  },
+  title: {
+    fontWeight: 'bold',
+    color: '#1a1a1a',
+    marginBottom: 12,
+  },
+  subtitle: {
+    color: '#666',
+    lineHeight: 22,
+  },
+  form: {
+    gap: 4,
+  },
+  input: {
+    marginBottom: 4,
+    backgroundColor: '#fff',
+  },
+  errorText: {
+    color: '#B00020',
+    marginBottom: 8,
+    marginLeft: 4,
+  },
+  button: {
+    marginTop: 8,
+    borderRadius: 8,
+  },
+  buttonContent: {
+    paddingVertical: 6,
+  },
+  backButton: {
+    marginTop: 16,
+    alignSelf: 'center',
+  },
+});
