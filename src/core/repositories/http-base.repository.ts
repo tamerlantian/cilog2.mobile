@@ -170,7 +170,7 @@ export class HttpBaseRepository {
       ? endpoint.substring(1)
       : endpoint;
     const baseUrl = this.getCurrentBaseUrl();
-    return `${baseUrl}/${normalizedEndpoint}`;
+    return `${baseUrl}${normalizedEndpoint}`;
   }
 
   /**

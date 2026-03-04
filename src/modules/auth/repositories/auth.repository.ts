@@ -41,7 +41,7 @@ export class AuthRepository extends HttpBaseRepository implements IAuthService {
    * @returns Promise con la respuesta del login
    */
   async login(credentials: LoginCredentials): Promise<LoginResponse> {
-    return this.post<LoginResponse>('seguridad/login/', credentials);
+    return this.post<LoginResponse>('api/usuario/autenticar', credentials);
   }
 
   /**
