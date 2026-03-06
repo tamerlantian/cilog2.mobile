@@ -4,7 +4,7 @@
 export interface LoginCredentials {
   username: string;
   password: string;
-  proyecto: string;
+  tokenFirebase: string | null;
 }
 
 export interface RegisterCredentials {
@@ -12,37 +12,34 @@ export interface RegisterCredentials {
   password: string;
   confirmarPassword: string;
   aceptarTerminosCondiciones: boolean;
+  celular: string;
   aplicacion: string;
 }
 
-// Interfaz para el usuario autenticado
-export interface AuthUser {
-  id: number;
-  username: string;
-  imagen: string;
-  nombre_corto: string;
-  nombre: string | null;
-  apellido: string | null;
-  telefono: string | null;
-  correo: string;
-  idioma: string | null;
-  dominio: string;
-  fecha_limite_pago: string;
-  fecha_creacion: string;
-  vr_saldo: number;
-  verificado: boolean;
-  es_socio: boolean;
-  socio_id: string;
-  is_active: boolean;
-  numero_identificacion: string;
-  cargo: string;
+// Respuesta real del backend (sin JWT)
+export interface ApiLoginResponse {
+  autenticar: boolean;
+  usuario: AuthUser;
 }
 
-// Interfaz para la respuesta de login
-export interface LoginResponse {
-  user: AuthUser;
-  token: string;
-  'refresh-token': string;
+// Interfaz para el usuario autenticado (campos reales del backend)
+export interface AuthUser {
+  codigo: number;
+  usuario: string; // email del usuario
+  nombre: string;
+  urlImagen: string;
+  codigoCelda: string;
+  codigoPanal: string;
+  codigoCiudad: string;
+  codigoPuesto: string;
+  codigoTercero: string;
+  codigoOperador: string;
+  calidadImagen: string;
+  codigoOperacion: string;
+  celda: string;
+  operador: string;
+  puntoServicio: string;
+  puntoServicioToken: string;
 }
 
 export interface RegisterResponse {
@@ -57,12 +54,12 @@ export interface AuthState {
   error: string | null;
 }
 
-// Interfaz para la respuesta de token refresh
+// Mantenido para compatibilidad con IAuthService / token.service (no usado activamente)
 export interface RefreshTokenResponse {
- access: string;
+  access: string;
 }
 
+/** Solo el campo que el usuario ingresa. `aplicacion` se inyecta en el controller. */
 export type ForgotPasswordFormValues = {
   username: string;
-  aplicacion: string;
 };

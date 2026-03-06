@@ -1,4 +1,4 @@
-package com.yourcompany.yourapp
+package com.semantica.cilog
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate

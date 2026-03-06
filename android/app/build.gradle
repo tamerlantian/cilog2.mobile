@@ -3,6 +3,7 @@ apply from: project(':react-native-config').projectDir.getPath() + "/dotenv.grad
 apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
 apply plugin: "org.jetbrains.kotlin.android"
 apply plugin: "com.facebook.react"
+apply plugin: "com.google.gms.google-services"
 
 /**
  * This is the configuration block to customize your React Native Android app.
@@ -80,11 +81,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    // TODO: Replace with your app's package name
-    namespace "com.yourcompany.yourapp"
+    namespace "com.semantica.cilog"
     defaultConfig {
-        // TODO: Replace with your app's application ID
-        applicationId "com.yourcompany.yourapp"
+        applicationId "com.semantica.cilog"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

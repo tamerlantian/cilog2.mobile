@@ -1,38 +1,45 @@
 import { useMutation } from '@tanstack/react-query';
-import { authController } from '../controllers/auth.controller';
-import { ForgotPasswordFormValues } from '../models/Auth';
 import Toast from 'react-native-toast-message';
-import { ApiErrorResponse } from '../../../core/interfaces/api.interface';
 import { useAuthNavigation } from '../../../navigation/hooks';
 import { toastTextOneStyle } from '../../../shared/styles/global.style';
 import { networkService } from '../../../shared/services/network.service';
 import { reportMutationError } from '../../../shared/utils/sentry-helpers';
+import { authController } from '../controllers/auth.controller';
+import { ForgotPasswordFormValues } from '../models/Auth';
+import { AuthErrorMapperService } from '../services/auth-error-mapper.service';
 
-// Hook para manejar la recuperación de contraseña
+/**
+ * View-model para el flujo de recuperación de contraseña.
+ *
+ * Responsabilidades:
+ * - Verificar conectividad antes de intentar el envío
+ * - Delegar la llamada al controller (quien inyecta `aplicacion` desde environment)
+ * - Mapear errores de la API a mensajes comprensibles para el usuario
+ * - Reportar errores inesperados a Sentry
+ * - Navegar a Login tras el envío exitoso
+ */
 export const useForgotPassword = () => {
   const navigation = useAuthNavigation();
 
   const forgotPasswordMutation = useMutation({
     mutationFn: async (data: ForgotPasswordFormValues) => {
-      // Verificar conectividad antes de intentar recuperación de contraseña
       const isConnected = await networkService.isConnected();
-      
       if (!isConnected) {
         throw new Error('NO_INTERNET_CONNECTION');
       }
-      
       return authController.forgotPassword(data);
     },
     onSuccess: () => {
       Toast.show({
         type: 'success',
-        text1: 'Revisa tu correo para restablecer tu clave',
-        text1Style: toastTextOneStyle
+        text1: 'Correo enviado',
+        text2: 'Revisa tu bandeja de entrada para restablecer tu contraseña',
+        text1Style: toastTextOneStyle,
       });
       navigation.navigate('Login');
     },
     onError: (error: any, variables: ForgotPasswordFormValues) => {
-      // Manejar error específico de conectividad (NO reportar a Sentry)
+      // Error de conectividad — no reportar a Sentry
       if (error.message === 'NO_INTERNET_CONNECTION') {
         Toast.show({
           type: 'error',
@@ -43,20 +50,19 @@ export const useForgotPassword = () => {
         return;
       }
 
-      // Report to Sentry BEFORE showing toast
       reportMutationError('forgot_password', error, {
         module: 'auth',
         operation: 'forgot_password',
         location: 'forgot-password-view-model',
-        email: variables.username, // Safe to include email
+        email: variables.username,
       });
 
-      // Manejar otros errores usando la lógica existente
-      const errorData = error as ApiErrorResponse;
+      const mapped = AuthErrorMapperService.mapError(error, 'login');
       Toast.show({
         type: 'error',
-        text1: errorData?.mensaje || 'Error al solicitar recuperación de contraseña',
-        text1Style: toastTextOneStyle
+        text1: mapped.title,
+        text2: mapped.message,
+        text1Style: toastTextOneStyle,
       });
     },
   });

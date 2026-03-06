@@ -1,69 +1,71 @@
 import { useState } from 'react';
-import { useAuth } from '../context/auth.context';
-import { LoginCredentials } from '../models/Auth';
-import { ApiErrorResponse } from '../../../core/interfaces/api.interface';
 import Toast from 'react-native-toast-message';
 import { toastTextOneStyle } from '../../../shared/styles/global.style';
 import { networkService } from '../../../shared/services/network.service';
+import { firebaseMessagingService } from '../../../shared/services/firebase-messaging.service';
+import { reportMutationError } from '../../../shared/utils/sentry-helpers';
+import { useAuth } from '../context/auth.context';
+import { LoginFormValues } from '../interfaces/auth.interface';
+import { AuthErrorMapperService } from '../services/auth-error-mapper.service';
 
+/**
+ * Hook de presentación para el flujo de inicio de sesión.
+ *
+ * Responsabilidades:
+ * - Verificar conectividad antes de intentar autenticar
+ * - Obtener el token FCM e inyectarlo en las credenciales
+ * - Delegar la autenticación y el manejo de estado al AuthContext
+ * - Mapear errores de la API a mensajes comprensibles para el usuario
+ * - Reportar errores inesperados a Sentry
+ *
+ * No conoce detalles de implementación del repositorio ni del almacenamiento.
+ */
 export const useLogin = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  
   const { login: authLogin } = useAuth();
 
-  const login = async (credentials: LoginCredentials) => {
+  const login = async (formValues: LoginFormValues) => {
     try {
       setIsLoading(true);
-      setError(null);
-      
-      // Verificar conectividad antes de intentar login
+
       const isConnected = await networkService.isConnected();
-      
       if (!isConnected) {
-        throw new Error('NO_INTERNET_CONNECTION');
-      }
-      
-      await authLogin(credentials);
-      
-      // El toast de éxito se maneja en el AuthContext
-    } catch (err: any) {
-      // Manejar error específico de conectividad
-      if (err.message === 'NO_INTERNET_CONNECTION') {
-        const errorMessage = 'Sin conexión a internet';
-        setError(errorMessage);
-        
         Toast.show({
           type: 'error',
-          text1: errorMessage,
+          text1: 'Sin conexión a internet',
           text2: 'Verifica tu conexión e intenta nuevamente',
           text1Style: toastTextOneStyle,
         });
-        
-        throw err;
+        return;
       }
-      
-      // Manejar otros errores usando la lógica existente
-      const errorData = err as ApiErrorResponse;
-      const errorMessage = errorData?.mensaje || 'Error al iniciar sesión';
-      
-      setError(errorMessage);
-      
+
+      // Obtener token FCM; si no hay permisos o falla, continuar con null
+      const tokenFirebase = await firebaseMessagingService.getToken();
+
+      await authLogin({
+        username: formValues.username,
+        password: formValues.password,
+        tokenFirebase,
+      });
+    } catch (error: any) {
+      reportMutationError('login', error, {
+        module: 'auth',
+        operation: 'login',
+        location: 'useLogin-hook',
+        email: formValues.username,
+      });
+
+      const mapped = AuthErrorMapperService.mapError(error, 'login');
       Toast.show({
         type: 'error',
-        text1: errorMessage,
+        text1: mapped.title,
+        text2: mapped.message,
         text1Style: toastTextOneStyle,
       });
-      
-      throw err;
     } finally {
       setIsLoading(false);
     }
   };
 
-  return {
-    login,
-    isLoading,
-    error,
-  };
+  return { login, isLoading };
 };

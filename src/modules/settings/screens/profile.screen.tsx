@@ -1,5 +1,12 @@
 import React from 'react';
-import { ScrollView, Text, TouchableOpacity, View, Alert, Linking } from 'react-native';
+import {
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+  Alert,
+  Linking,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Ionicons from '@react-native-vector-icons/ionicons';
 import { useAuth } from '../../auth/context/auth.context';
@@ -38,7 +45,7 @@ export const ProfileScreen = () => {
             console.log('Eliminando cuenta...');
           },
         },
-      ]
+      ],
     );
   };
 
@@ -57,23 +64,18 @@ export const ProfileScreen = () => {
           <View style={profileStyles.userInfoContainer}>
             <View style={profileStyles.avatar}>
               <Text style={profileStyles.avatarText}>
-                {user.nombre ? user.nombre.charAt(0).toUpperCase() : user.username?.charAt(0).toUpperCase() || 'U'}
+                {user.nombre
+                  ? user.nombre.charAt(0).toUpperCase()
+                  : user.usuario?.charAt(0).toUpperCase() || 'U'}
               </Text>
             </View>
-            
+
             <View style={profileStyles.userDetails}>
               <Text style={profileStyles.userName}>
-                {user.nombre || user.username || 'Usuario'}
+                {user.nombre || user.usuario || 'Usuario'}
               </Text>
-              {user.correo && (
-                <Text style={profileStyles.userEmail}>
-                  {user.correo}
-                </Text>
-              )}
-              {user.telefono && (
-                <Text style={profileStyles.userPhone}>
-                  {user.telefono}
-                </Text>
+              {user.usuario && (
+                <Text style={profileStyles.userEmail}>{user.usuario}</Text>
               )}
             </View>
           </View>
@@ -82,17 +84,20 @@ export const ProfileScreen = () => {
         {/* Enlaces Legales */}
         <View style={profileStyles.sectionContainer}>
           <Text style={profileStyles.sectionTitle}>Legal</Text>
-          
+
           <View style={profileStyles.optionsContainer}>
             {/* Términos de uso */}
             <TouchableOpacity
               style={profileStyles.optionButtonWithBorder}
               onPress={handleOpenTerms}
             >
-              <Ionicons name="document-text-outline" size={22} color="#6b7280" style={profileStyles.optionIcon} />
-              <Text style={profileStyles.optionText}>
-                Términos de uso
-              </Text>
+              <Ionicons
+                name="document-text-outline"
+                size={22}
+                color="#6b7280"
+                style={profileStyles.optionIcon}
+              />
+              <Text style={profileStyles.optionText}>Términos de uso</Text>
               <Ionicons name="open-outline" size={18} color="#d1d5db" />
             </TouchableOpacity>
 
@@ -101,7 +106,12 @@ export const ProfileScreen = () => {
               style={profileStyles.optionButtonWithBorder}
               onPress={handleOpenPrivacy}
             >
-              <Ionicons name="shield-checkmark-outline" size={22} color="#6b7280" style={profileStyles.optionIcon} />
+              <Ionicons
+                name="shield-checkmark-outline"
+                size={22}
+                color="#6b7280"
+                style={profileStyles.optionIcon}
+              />
               <Text style={profileStyles.optionText}>
                 Políticas de privacidad
               </Text>
@@ -113,7 +123,12 @@ export const ProfileScreen = () => {
               style={profileStyles.optionButton}
               onPress={handleDeleteAccount}
             >
-              <Ionicons name="trash-outline" size={22} color="#ef4444" style={profileStyles.optionIcon} />
+              <Ionicons
+                name="trash-outline"
+                size={22}
+                color="#ef4444"
+                style={profileStyles.optionIcon}
+              />
               <Text style={profileStyles.optionTextDanger}>
                 Eliminar cuenta
               </Text>

@@ -18,14 +18,12 @@ export const ForgotPasswordScreen = () => {
   } = useForm<ForgotPasswordFormValues>({
     defaultValues: {
       username: '',
-      aplicacion: '',
     },
     mode: 'onChange',
   });
 
-  const onSubmit = (data: ForgotPasswordFormValues) => {
-    forgotPassword(data);
-  };
+  // Los errores son manejados por el view-model (toast + Sentry); aquí solo iniciamos el flujo
+  const onSubmit = (data: ForgotPasswordFormValues) => forgotPassword(data);
 
   return (
     <SafeAreaView style={styles.safeArea}>

@@ -6,42 +6,35 @@ import { Linking, ScrollView, StyleSheet, View } from 'react-native';
 import { Button, Checkbox, Text, TextInput } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AuthStackParamList } from '../../../navigation/types';
+import { isValidPhoneNumber } from '../../../shared/utils/phone.util';
 import { RegisterFormValues } from '../interfaces/auth.interface';
 import { useRegister } from '../view-models/register.view-model';
 
-type RegisterScreenNavigationProp = NativeStackNavigationProp<AuthStackParamList, 'Register'>;
+// TODO: Reemplazar con las URLs reales de términos y privacidad de la app
+const TERMS_URL = 'https://example.com/terminos_de_uso';
+const PRIVACY_URL = 'https://example.com/politicas_privacidad';
+
+type RegisterScreenNavigationProp = NativeStackNavigationProp<
+  AuthStackParamList,
+  'Register'
+>;
+
+const openUrl = async (url: string) => {
+  try {
+    const supported = await Linking.canOpenURL(url);
+    if (supported) {
+      await Linking.openURL(url);
+    }
+  } catch {
+    // Si el sistema no puede abrir la URL, se ignora silenciosamente
+  }
+};
 
 export const RegisterScreen = () => {
   const navigation = useNavigation<RegisterScreenNavigationProp>();
   const { register, isLoading } = useRegister();
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
-
-  // TODO: Replace with your project's terms URL
-  const handleOpenTerms = async () => {
-    const url = 'https://example.com/terminos_de_uso';
-    try {
-      const supported = await Linking.canOpenURL(url);
-      if (supported) {
-        await Linking.openURL(url);
-      }
-    } catch (error) {
-      console.error('Error al abrir términos y condiciones:', error);
-    }
-  };
-
-  // TODO: Replace with your project's privacy URL
-  const handleOpenPrivacy = async () => {
-    const url = 'https://example.com/politicas_privacidad';
-    try {
-      const supported = await Linking.canOpenURL(url);
-      if (supported) {
-        await Linking.openURL(url);
-      }
-    } catch (error) {
-      console.error('Error al abrir políticas de privacidad:', error);
-    }
-  };
 
   const {
     control,
@@ -52,8 +45,8 @@ export const RegisterScreen = () => {
     defaultValues: {
       username: '',
       password: '',
-      aplicacion: '',
       confirmarPassword: '',
+      celular: '',
       aceptarTerminosCondiciones: false,
     },
     mode: 'onChange',
@@ -61,15 +54,8 @@ export const RegisterScreen = () => {
 
   const password = watch('password');
 
-  const onSubmit = (data: RegisterFormValues) => {
-    register({
-      username: data.username,
-      password: data.password,
-      confirmarPassword: data.confirmarPassword,
-      aceptarTerminosCondiciones: data.aceptarTerminosCondiciones,
-      aplicacion: data.aplicacion,
-    });
-  };
+  // Los errores son manejados por el view-model (toast + Sentry); aquí solo iniciamos el flujo
+  const onSubmit = (data: RegisterFormValues) => register(data);
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -87,6 +73,7 @@ export const RegisterScreen = () => {
         </View>
 
         <View style={styles.form}>
+          {/* Correo electrónico */}
           <Controller
             control={control}
             name="username"
@@ -103,6 +90,7 @@ export const RegisterScreen = () => {
                 mode="outlined"
                 keyboardType="email-address"
                 autoCapitalize="none"
+                autoCorrect={false}
                 onChangeText={onChange}
                 onBlur={onBlur}
                 value={value}
@@ -118,14 +106,15 @@ export const RegisterScreen = () => {
             </Text>
           )}
 
+          {/* Contraseña */}
           <Controller
             control={control}
             name="password"
             rules={{
               required: 'La contraseña es obligatoria',
               minLength: {
-                value: 6,
-                message: 'La contraseña debe tener al menos 6 caracteres',
+                value: 8,
+                message: 'La contraseña debe tener al menos 8 caracteres',
               },
             }}
             render={({ field: { onChange, onBlur, value } }) => (
@@ -156,6 +145,7 @@ export const RegisterScreen = () => {
             </Text>
           )}
 
+          {/* Confirmar contraseña */}
           <Controller
             control={control}
             name="confirmarPassword"
@@ -179,7 +169,9 @@ export const RegisterScreen = () => {
                 left={<TextInput.Icon icon="lock-check-outline" />}
                 right={
                   <TextInput.Icon
-                    icon={confirmPasswordVisible ? 'eye-off-outline' : 'eye-outline'}
+                    icon={
+                      confirmPasswordVisible ? 'eye-off-outline' : 'eye-outline'
+                    }
                     onPress={() => setConfirmPasswordVisible(v => !v)}
                   />
                 }
@@ -192,6 +184,37 @@ export const RegisterScreen = () => {
             </Text>
           )}
 
+          {/* Número de celular */}
+          <Controller
+            control={control}
+            name="celular"
+            rules={{
+              required: 'El número de celular es obligatorio',
+              validate: value =>
+                isValidPhoneNumber(value) ||
+                'Ingresa un número de celular válido',
+            }}
+            render={({ field: { onChange, onBlur, value } }) => (
+              <TextInput
+                label="Celular"
+                mode="outlined"
+                keyboardType="phone-pad"
+                onChangeText={onChange}
+                onBlur={onBlur}
+                value={value}
+                error={!!errors.celular}
+                style={styles.input}
+                left={<TextInput.Icon icon="phone-outline" />}
+              />
+            )}
+          />
+          {errors.celular && (
+            <Text variant="bodySmall" style={styles.errorText}>
+              {errors.celular.message}
+            </Text>
+          )}
+
+          {/* Términos y condiciones */}
           <Controller
             control={control}
             name="aceptarTerminosCondiciones"
@@ -208,7 +231,7 @@ export const RegisterScreen = () => {
                     <Text
                       variant="bodyMedium"
                       style={styles.link}
-                      onPress={handleOpenTerms}
+                      onPress={() => openUrl(TERMS_URL)}
                     >
                       términos
                     </Text>
@@ -216,7 +239,7 @@ export const RegisterScreen = () => {
                     <Text
                       variant="bodyMedium"
                       style={styles.link}
-                      onPress={handleOpenPrivacy}
+                      onPress={() => openUrl(PRIVACY_URL)}
                     >
                       condiciones
                     </Text>

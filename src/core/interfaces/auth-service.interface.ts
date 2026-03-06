@@ -1,4 +1,4 @@
-import { RefreshTokenResponse } from '../../modules/auth/interfaces/auth.interface';
+import { RefreshTokenResponse } from '../../modules/auth/models/Auth';
 
 /**
  * Interfaz para servicios de autenticación

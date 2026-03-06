@@ -1,7 +1,7 @@
-package com.yourcompany.yourapp
+package com.semantica.cilog
 
 import android.app.Application
-import com.yourcompany.yourapp.BuildConfig
+import com.semantica.cilog.BuildConfig
 import com.facebook.react.PackageList
 import com.facebook.react.ReactApplication
 import com.facebook.react.ReactHost

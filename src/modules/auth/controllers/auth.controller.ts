@@ -1,99 +1,81 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
-  ForgotPasswordFormValues,
-  LoginCredentials,
-  LoginResponse,
-  RegisterCredentials,
-  RegisterResponse,
-} from '../models/Auth';
-import {
   AUTH_TOKEN_KEY,
   REFRESH_TOKEN_KEY,
   USER_DATA_KEY,
 } from '../../../shared/constants/localstorage-keys';
+import {
+  ApiLoginResponse,
+  AuthUser,
+  ForgotPasswordFormValues,
+  LoginCredentials,
+  RegisterCredentials,
+  RegisterResponse,
+} from '../models/Auth';
 import { AuthRepository } from '../repositories/auth.repository';
 
-// Instancia del repositorio de autenticación
-
-// Controlador para manejar las operaciones relacionadas con autenticación
+/**
+ * Capa de orquestación entre las capas de presentación y el repositorio.
+ *
+ * Responsabilidades:
+ * - Llamar al repositorio para operaciones de autenticación
+ * - Persistir/limpiar datos de usuario en AsyncStorage
+ * - Verificar que el backend confirme la autenticación (autenticar === true)
+ * - Inyectar datos de configuración que no provienen del usuario (ej: `proyecto`)
+ *
+ * Nota: el backend actual no emite JWT. Los tokens (AUTH_TOKEN_KEY, REFRESH_TOKEN_KEY)
+ * están reservados para cuando el backend los soporte. La sesión se persiste con USER_DATA_KEY.
+ */
 export const authController = {
-  // Realizar login de usuario
-  login: async (credentials: LoginCredentials): Promise<LoginResponse> => {
-    try {
-      const response = await AuthRepository.getInstance().login(credentials);
+  login: async (credentials: LoginCredentials): Promise<ApiLoginResponse> => {
+    const response = await AuthRepository.getInstance().login(credentials);
 
-      // Guardar tokens y datos del usuario en el almacenamiento local
-      await AsyncStorage.setItem(AUTH_TOKEN_KEY, response.token);
-      await AsyncStorage.setItem(REFRESH_TOKEN_KEY, response['refresh-token']);
-      await AsyncStorage.setItem(USER_DATA_KEY, JSON.stringify(response.user));
-
-      return response;
-    } catch (error) {
-      throw error;
+    if (!response.autenticar) {
+      throw new Error('Credenciales inválidas');
     }
+
+    await AsyncStorage.setItem(USER_DATA_KEY, JSON.stringify(response.usuario));
+    return response;
   },
 
-  // Registrar nuevo usuario
-  register: async (userData: RegisterCredentials): Promise<RegisterResponse> => {
-    try {
-      const response = await AuthRepository.getInstance().register(userData);
-      return response;
-    } catch (error) {
-      console.error('Error en registro:', error);
-      throw error;
-    }
+  register: async (
+    userData: RegisterCredentials,
+  ): Promise<RegisterResponse> => {
+    return AuthRepository.getInstance().register(userData);
   },
 
-  // Cerrar sesión
   logout: async (): Promise<boolean> => {
-    try {
-      // await authRepository.logout();
-
-      // Limpiar datos de autenticación del almacenamiento local
-      await AsyncStorage.multiRemove([AUTH_TOKEN_KEY, REFRESH_TOKEN_KEY, USER_DATA_KEY]);
-
-      return true;
-    } catch (error) {
-      console.error('Error en logout:', error);
-      // Aún si falla la petición al servidor, limpiamos el almacenamiento local
-      await AsyncStorage.multiRemove([AUTH_TOKEN_KEY, REFRESH_TOKEN_KEY, USER_DATA_KEY]);
-      return true;
-    }
+    await AsyncStorage.multiRemove([
+      AUTH_TOKEN_KEY,
+      REFRESH_TOKEN_KEY,
+      USER_DATA_KEY,
+    ]);
+    return true;
   },
 
-  // Verificar si hay un usuario autenticado
   isAuthenticated: async (): Promise<boolean> => {
     try {
-      const token = await AsyncStorage.getItem(AUTH_TOKEN_KEY);
-      return !!token; // Simple: si hay token, está autenticado
+      const userData = await AsyncStorage.getItem(USER_DATA_KEY);
+      return !!userData;
     } catch {
       return false;
     }
   },
 
-  // Obtener el token actual
-  getToken: async (): Promise<string | null> => {
-    return AsyncStorage.getItem(AUTH_TOKEN_KEY);
-  },
-
-  // Obtener datos del usuario actual
-  getCurrentUser: async () => {
+  getCurrentUser: async (): Promise<AuthUser | null> => {
     try {
       const userData = await AsyncStorage.getItem(USER_DATA_KEY);
       return userData ? JSON.parse(userData) : null;
-    } catch (error) {
-      console.error('Error al obtener datos del usuario:', error);
+    } catch {
       return null;
     }
   },
 
-  // Solicitar recuperación de contraseña
+  /**
+   * Solicita recuperación de contraseña.
+   * `aplicacion` se inyecta desde `environment.proyecto` — no es un campo del formulario.
+   */
   forgotPassword: async (data: ForgotPasswordFormValues): Promise<boolean> => {
-    try {
-      return await AuthRepository.getInstance().forgotPassword(data.username, data.aplicacion);
-    } catch (error) {
-      console.error('Error al solicitar recuperación de contraseña:', error);
-      throw error;
-    }
+    return AuthRepository.getInstance().forgotPassword(data.username);
   },
 };

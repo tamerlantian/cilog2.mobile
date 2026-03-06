@@ -1,4 +1,3 @@
-
 import { ApiErrorResponse } from '../../../core/interfaces/api.interface';
 
 /**
@@ -30,13 +29,14 @@ export class AuthErrorMapperService {
   /**
    * Mapea errores basándose en la estructura ApiErrorResponse
    */
-  static mapError(error: any, context: 'login' | 'register' = 'register'): MappedError {
-    console.log(' Error recibido:', error);
-    
-    // Extraer datos del error según la estructura de tu API
+  static mapError(
+    error: any,
+    context: 'login' | 'register' = 'register',
+  ): MappedError {
+    // Extraer datos del error según la estructura de la API
     let apiError: ApiErrorResponse | undefined;
     let statusCode: number | undefined;
-    
+
     if (error?.response?.data) {
       // Estructura típica de axios: error.response.data contiene ApiErrorResponse
       apiError = error.response.data as ApiErrorResponse;
@@ -49,23 +49,22 @@ export class AuthErrorMapperService {
       // Fallback para otros tipos de error
       statusCode = error?.status || error?.response?.status;
     }
-    
-    console.log(' API Error:', apiError);
-    console.log(' Status code extraído:', statusCode);
-    
+
     // Mapeo basado en código de estado, usando mensaje del servidor cuando sea apropiado
     switch (statusCode) {
       case 400:
         if (context === 'register') {
           return {
             title: 'Usuario ya existe',
-            message: 'Ya existe una cuenta registrada con este correo electrónico',
+            message:
+              'Ya existe una cuenta registrada con este correo electrónico',
             type: AuthErrorType.USER_ALREADY_EXISTS,
           };
         } else {
           return {
             title: 'Credenciales incorrectas',
-            message: 'El correo o la contraseña son incorrectos. Verifica tus datos e intenta nuevamente.',
+            message:
+              'El correo o la contraseña son incorrectos. Verifica tus datos e intenta nuevamente.',
             type: AuthErrorType.INVALID_CREDENTIALS,
           };
         }
@@ -73,21 +72,24 @@ export class AuthErrorMapperService {
       case 401:
         return {
           title: 'Credenciales incorrectas',
-          message: 'El correo o la contraseña son incorrectos. Verifica tus datos e intenta nuevamente.',
+          message:
+            'El correo o la contraseña son incorrectos. Verifica tus datos e intenta nuevamente.',
           type: AuthErrorType.INVALID_CREDENTIALS,
         };
 
       case 409:
         return {
           title: 'Usuario ya existe',
-          message: 'Ya existe una cuenta registrada con este correo electrónico. Intenta iniciar sesión.',
+          message:
+            'Ya existe una cuenta registrada con este correo electrónico. Intenta iniciar sesión.',
           type: AuthErrorType.USER_ALREADY_EXISTS,
         };
 
       case 422:
         return {
           title: 'Datos inválidos',
-          message: 'Los datos ingresados no son válidos. Verifica el formato del correo y la contraseña.',
+          message:
+            'Los datos ingresados no son válidos. Verifica el formato del correo y la contraseña.',
           type: AuthErrorType.INVALID_EMAIL,
         };
 
@@ -96,7 +98,8 @@ export class AuthErrorMapperService {
       case 503:
         return {
           title: 'Error del servidor',
-          message: 'Estamos experimentando problemas técnicos. Por favor intenta nuevamente en unos minutos.',
+          message:
+            'Estamos experimentando problemas técnicos. Por favor intenta nuevamente en unos minutos.',
           type: AuthErrorType.SERVER_ERROR,
         };
 
@@ -105,15 +108,20 @@ export class AuthErrorMapperService {
         if (!error.response && error.request) {
           return {
             title: 'Sin conexión',
-            message: 'No hay conexión a internet. Verifica tu conexión e intenta nuevamente.',
+            message:
+              'No hay conexión a internet. Verifica tu conexión e intenta nuevamente.',
             type: AuthErrorType.NETWORK_ERROR,
           };
         }
-        
+
         // Error genérico
         return {
-          title: context === 'register' ? 'Error de registro' : 'Error de inicio de sesión',
-          message: 'Ocurrió un error. Por favor verifica tus datos e intenta nuevamente.',
+          title:
+            context === 'register'
+              ? 'Error de registro'
+              : 'Error de inicio de sesión',
+          message:
+            'Ocurrió un error. Por favor verifica tus datos e intenta nuevamente.',
           type: AuthErrorType.UNKNOWN_ERROR,
         };
     }

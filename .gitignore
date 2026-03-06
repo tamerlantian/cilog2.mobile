@@ -85,3 +85,5 @@ ios/sentry.properties
 .env.staging
 .env.production
 # .env.example SÍ se commitea (template sin valores reales)
+
+android/app/google-services.json

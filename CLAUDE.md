@@ -273,3 +273,5 @@ export const authKeys = {
 
 ### Common Tasks
 - Siempre intenta implementar buenas practicas
+- Debes usar siempre kebab case para los nombres de los archivos
+- Cuando crees una nueva screen debe estar compuesto por su .screen y su .view-model para separar la logica de negocio de la presentacion

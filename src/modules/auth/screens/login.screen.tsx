@@ -21,18 +21,12 @@ export const LoginScreen = () => {
     defaultValues: {
       username: '',
       password: '',
-      proyecto: 'RUTEOAPP',
     },
     mode: 'onChange',
   });
 
-  const onSubmit = async (data: LoginFormValues) => {
-    try {
-      await login(data);
-    } catch (error) {
-      console.error('Error durante el login:', error);
-    }
-  };
+  // Los errores son manejados por el hook (toast + Sentry); aquí solo iniciamos el flujo
+  const onSubmit = (data: LoginFormValues) => login(data);
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -87,8 +81,8 @@ export const LoginScreen = () => {
             rules={{
               required: 'La contraseña es obligatoria',
               minLength: {
-                value: 6,
-                message: 'La contraseña debe tener al menos 6 caracteres',
+                value: 8,
+                message: 'La contraseña debe tener al menos 8 caracteres',
               },
             }}
             render={({ field: { onChange, onBlur, value } }) => (

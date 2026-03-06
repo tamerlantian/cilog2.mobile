@@ -1,47 +1,62 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { RegisterCredentials } from '../models/Auth';
-import { authController } from '../controllers/auth.controller';
-import { authKeys } from '../constants/auth-keys';
 import Toast from 'react-native-toast-message';
-import { toastTextOneStyle } from '../../../shared/styles/global.style';
-import { AuthErrorMapperService } from '../services/auth-error-mapper.service';
+import { environment } from '../../../config/environment';
 import { useAuthNavigation } from '../../../navigation/hooks/useTypedNavigation';
+import { toastTextOneStyle } from '../../../shared/styles/global.style';
 import { networkService } from '../../../shared/services/network.service';
 import { reportMutationError } from '../../../shared/utils/sentry-helpers';
+import { authKeys } from '../constants/auth-keys';
+import { authController } from '../controllers/auth.controller';
+import { RegisterFormValues } from '../interfaces/auth.interface';
+import { AuthErrorMapperService } from '../services/auth-error-mapper.service';
 
-// Hook para manejar el registro
+/**
+ * View-model para el flujo de registro de nuevo usuario.
+ *
+ * Responsabilidades:
+ * - Verificar conectividad antes de intentar el registro
+ * - Enriquecer los valores del formulario con el identificador de la app
+ * - Delegar la persistencia al controller
+ * - Mapear errores de la API a mensajes comprensibles para el usuario
+ * - Reportar errores inesperados a Sentry
+ * - Navegar a Login tras un registro exitoso
+ */
 export const useRegister = () => {
   const queryClient = useQueryClient();
   const navigation = useAuthNavigation();
 
   const registerMutation = useMutation({
-    mutationFn: async (userData: RegisterCredentials) => {
-      // Verificar conectividad antes de intentar registro
+    mutationFn: async (formValues: RegisterFormValues) => {
       const isConnected = await networkService.isConnected();
-      
       if (!isConnected) {
         throw new Error('NO_INTERNET_CONNECTION');
       }
-      
-      return authController.register(userData);
+
+      // Enriquecer con el identificador de la app (no es un campo del formulario)
+      return authController.register({
+        username: formValues.username,
+        password: formValues.password,
+        confirmarPassword: formValues.confirmarPassword,
+        celular: formValues.celular,
+        aceptarTerminosCondiciones: formValues.aceptarTerminosCondiciones,
+        aplicacion: environment.proyecto,
+      });
     },
     onSuccess: () => {
-      // Actualizar el estado de autenticación y usuario
       queryClient.invalidateQueries({ queryKey: authKeys.session() });
       queryClient.invalidateQueries({ queryKey: authKeys.user() });
-      
-      // Mostrar mensaje de éxito
+
       Toast.show({
         type: 'success',
-        text1: 'Registro exitoso',
+        text1: 'Cuenta creada exitosamente',
+        text2: 'Ya puedes iniciar sesión',
         text1Style: toastTextOneStyle,
       });
-      
-      // Redirigir a la pantalla de login
+
       navigation.navigate('Login');
     },
-    onError: (error: any, variables: RegisterCredentials) => {
-      // Manejar error específico de conectividad (NO reportar a Sentry)
+    onError: (error: any, variables: RegisterFormValues) => {
+      // Error de conectividad — no reportar a Sentry (problema del usuario, no del código)
       if (error.message === 'NO_INTERNET_CONNECTION') {
         Toast.show({
           type: 'error',
@@ -52,21 +67,19 @@ export const useRegister = () => {
         return;
       }
 
-      // Report to Sentry BEFORE showing toast
+      // Reportar a Sentry antes de mostrar el toast
       reportMutationError('register', error, {
         module: 'auth',
         operation: 'register',
         location: 'register-view-model',
-        email: variables.username, // Safe to include email (no password!)
+        email: variables.username, // nunca incluir password
       });
 
-      // Manejar otros errores usando el mapper existente
-      const mappedError = AuthErrorMapperService.mapError(error, 'register');
-
+      const mapped = AuthErrorMapperService.mapError(error, 'register');
       Toast.show({
         type: 'error',
-        text1: mappedError.title,
-        text2: mappedError.message,
+        text1: mapped.title,
+        text2: mapped.message,
         text1Style: toastTextOneStyle,
       });
     },

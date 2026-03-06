@@ -8,13 +8,17 @@ export const DashboardScreen = () => {
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
-      <StatusBar barStyle="dark-content" backgroundColor="#f8f9fa" translucent={false} />
+      <StatusBar
+        barStyle="dark-content"
+        backgroundColor="#f8f9fa"
+        translucent={false}
+      />
       <View style={styles.content}>
         <Text style={styles.title}>Inicio</Text>
         {user && (
           <View style={styles.welcomeContainer}>
             <Text style={styles.welcomeText}>
-              ¡Hola, {user.nombre || user.username}!
+              ¡Hola, {user.nombre || user.usuario}!
             </Text>
             <Text style={styles.subtitleText}>Bienvenido a la aplicación</Text>
           </View>

@@ -1,17 +1,28 @@
-import React, { createContext, useContext, useEffect, useState, ReactNode, useCallback } from 'react';
-import { authController } from '../controllers/auth.controller';
-import { LoginCredentials, AuthUser } from '../models/Auth';
-import { useAuthActions } from '../hooks/useAuthActions';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+  ReactNode,
+} from 'react';
 import Toast from 'react-native-toast-message';
-import { toastTextOneStyle } from '../../../shared/styles/global.style';
+import { authController } from '../controllers/auth.controller';
+import { useAuthActions } from '../hooks/useAuthActions';
+import { LoginCredentials, AuthUser } from '../models/Auth';
 import { authEvents } from '../../../core/services/auth-events.service';
+import { toastTextOneStyle } from '../../../shared/styles/global.style';
 
 interface AuthContextType {
   // Estado
   isAuthenticated: boolean;
   user: AuthUser | null;
+  /**
+   * True únicamente durante la verificación inicial de sesión al arrancar la app.
+   * No refleja el estado de carga del formulario de login (ver useLogin hook).
+   */
   isLoading: boolean;
-  
+
   // Acciones
   login: (credentials: LoginCredentials) => Promise<void>;
   logout: () => Promise<void>;
@@ -26,33 +37,28 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  console.log('🔍 AuthProvider: Inicializando...');
-  
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  
-  console.log('🔍 AuthProvider: Estado inicial - isAuthenticated:', isAuthenticated, 'isLoading:', isLoading);
-  
+
   const { clearAppData } = useAuthActions();
 
-
-  // Verificar estado de autenticación al inicializar
+  /** Verifica si existe una sesión activa en el almacenamiento local. Solo se llama al arrancar. */
   const checkAuthStatus = async () => {
     try {
       setIsLoading(true);
       const authenticated = await authController.isAuthenticated();
-      
+
       if (authenticated) {
         const userData = await authController.getCurrentUser();
-        setIsAuthenticated(true); 
+        setIsAuthenticated(true);
         setUser(userData);
       } else {
         setIsAuthenticated(false);
         setUser(null);
       }
     } catch (error) {
-      console.error('Error checking auth status:', error);
+      console.error('[AuthContext] Error verificando estado de sesión:', error);
       setIsAuthenticated(false);
       setUser(null);
     } finally {
@@ -60,48 +66,35 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  // Login
+  /**
+   * Realiza el login del usuario.
+   * El backend devuelve { autenticar, usuario } — sin JWT.
+   * La gestión del estado de carga del formulario (spinner) es responsabilidad
+   * del hook `useLogin`, no de este contexto.
+   */
   const login = async (credentials: LoginCredentials) => {
-    try {
-      setIsLoading(true);
-      const response = await authController.login(credentials);
-      
-      setIsAuthenticated(true);
-      setUser(response.user);
-      
-      Toast.show({
-        type: 'success',
-        text1: 'Inicio de sesión exitoso',
-        text1Style: toastTextOneStyle,
-      });
-    } catch (error) {
-      setIsAuthenticated(false);
-      setUser(null);
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
+    const response = await authController.login(credentials);
+    setIsAuthenticated(true);
+    setUser(response.usuario);
+
+    Toast.show({
+      type: 'success',
+      text1: 'Inicio de sesión exitoso',
+      text1Style: toastTextOneStyle,
+    });
   };
 
-  // Logout completo - Usuario manual (limpia toda la data)
+  /** Logout manual — limpia tokens, datos de la app y estado local */
   const logout = useCallback(async () => {
     try {
       setIsLoading(true);
-      
-      // 1. Logout del servidor y limpiar tokens
       await authController.logout();
-      
-      // 2. Limpiar datos de la aplicación (Redux, etc.)
       await clearAppData();
-      
-      // 3. Actualizar estado local
       setIsAuthenticated(false);
       setUser(null);
-      
-      console.log('🔵 AuthContext: Logout completo ejecutado - Data limpiada');
     } catch (error) {
-      console.error('Error during logout:', error);
-      // Forzar logout local incluso si falla el servidor
+      console.error('[AuthContext] Error durante logout:', error);
+      // Forzar logout local aunque falle el servidor
       setIsAuthenticated(false);
       setUser(null);
     } finally {
@@ -109,49 +102,40 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, [clearAppData]);
 
-  // Logout por token expirado - Solo limpia autenticación (preserva data)
+  /** Logout por sesión expirada — preserva datos locales de la app */
   const logoutTokenExpired = useCallback(async () => {
     try {
       setIsLoading(true);
-      
-      // 1. Solo limpiar tokens del servidor (sin limpiar data local)
       await authController.logout();
-      
-      // 2. Actualizar estado local (SIN limpiar datos de la app)
       setIsAuthenticated(false);
       setUser(null);
-      
-      console.log('🟡 AuthContext: Logout por token expirado - Data preservada');
     } catch (error) {
-      console.error('Error during token expired logout:', error);
-      // Forzar logout local incluso si falla el servidor
+      console.error(
+        '[AuthContext] Error en logout por sesión expirada:',
+        error,
+      );
       setIsAuthenticated(false);
       setUser(null);
     } finally {
       Toast.show({
         type: 'error',
-        text1: 'Sesión cerrada por expiración de token',
+        text1: 'Sesión expirada',
+        text2: 'Por favor inicia sesión nuevamente',
         text1Style: toastTextOneStyle,
       });
       setIsLoading(false);
     }
   }, []);
 
-  // Verificar estado al montar el componente
+  // Verificar sesión al montar la app
   useEffect(() => {
-    console.log('🔍 AuthProvider: useEffect ejecutándose...');
     checkAuthStatus();
   }, []);
 
-  // Escuchar eventos de expiración de token
+  // Escuchar expiración de sesión emitida por el interceptor HTTP
   useEffect(() => {
-    const handleTokenExpired = () => {
-      console.log('🔴 AuthContext: Token expirado - ejecutando logoutTokenExpired');
-      logoutTokenExpired();
-    };
-
+    const handleTokenExpired = () => logoutTokenExpired();
     authEvents.on('TOKEN_EXPIRED', handleTokenExpired);
-    
     return () => {
       authEvents.off('TOKEN_EXPIRED', handleTokenExpired);
     };
@@ -167,13 +151,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     checkAuthStatus,
   };
 
-  console.log('🔍 AuthProvider: Renderizando con valor:', value);
-
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = (): AuthContextType => {
